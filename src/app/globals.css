@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+    --app-bg-color: #cd5ff8;
+}
+
+.app-bg-color {
+    background-color: var(--app-bg-color) !important;
+}
+.app-text-color {
+    color: var(--app-bg-color) !important;
+}

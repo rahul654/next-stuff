@@ -1,0 +1,7 @@
+.input-outline-none:focus {
+  outline: none;
+  border: none;
+}
+.custom-input-box-shadow{
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1); /* Optional subtle focus effect */
+}
