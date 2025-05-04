@@ -1,5 +1,4 @@
 'use client'
-import { Button } from "@/components/ui/button";
 import { decrementAsyncAction, incrementAsyncAction } from "@/nihon/redux/counterAsyncAction";
 import { StateInterface } from "@/nihon/redux/store";
 import React from "react";
@@ -15,7 +14,6 @@ export default function Home() {
       <>
         <div>
           hello rahul bhai <br />
-          <Button onClick={() => { console.log('::: hello rahul'); }}>Button</Button>
           <div>{counterState}</div>
           <button onClick={() => dispatch({ type: "INCREMENT", payload: 1 })}>increment</button>
           <button onClick={() => dispatch({ type: "DECREMENT", payload: 2 })}>decrement</button>
