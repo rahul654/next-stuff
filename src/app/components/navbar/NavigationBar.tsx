@@ -27,7 +27,7 @@ export const Navbar = () => {
         </button>
         <div className="flex-1 flex justify-center items-center text-white text-center my-auto">
           <div className="cursor-pointer" onClick={() => {route("/")}}>
-            Rahul
+            Home
           </div>
         </div>
       </nav>
@@ -48,8 +48,6 @@ export const Navbar = () => {
         <ul className="mt-16 space-y-4 p-4">
           <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/")}}>Home</li>
           <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/parent-child-checkbox")}}>parent-child-checkbox</li>
-          <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/otp-input")}}>otp-input</li>
-          <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/rest-components")}}>rest-components</li>
         </ul>
       </div>
 
