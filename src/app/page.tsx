@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div>
       <div className="flex flex-wrap justify-center mx-[10px]">
-        <div className="w-full sm:w-full md:w-[calc(50%-40px)] lg:flex-1 m-[20px]">
+        <div className="w-full sm:w-full md:w-[calc(50%-40px)] lg:w-[calc(30%-40px)] m-[20px]">
           <ProjectCards
             title="parent-child-checkbox"
             description="Checkbox Tree Selector: A hierarchical checkbox component 
