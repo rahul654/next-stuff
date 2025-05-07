@@ -1,5 +1,10 @@
-'use client';
-import React, { useState, useImperativeHandle, forwardRef, useRef } from "react";
+"use client";
+import React, {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+} from "react";
 import { useExistingClasses } from "@/nihon/app/utilities";
 import "./index.css";
 
@@ -10,6 +15,7 @@ export interface ISearchableDropdownProps {
   placeHolder?: string;
   label?: string;
   required?: boolean;
+  searchEnable?: boolean;
   overriddenStyles?: {
     containerStyle?: React.CSSProperties;
     labelStyle?: React.CSSProperties;
@@ -36,6 +42,7 @@ export const SearchableDropdown = forwardRef(
       placeHolder = "Select an option",
       label,
       required = false,
+      searchEnable = true,
       overriddenStyles,
       overriddenStylesClassNames,
     }: ISearchableDropdownProps,
@@ -131,20 +138,25 @@ export const SearchableDropdown = forwardRef(
               ...overriddenStyles?.dropdownStyle,
             }}
           >
-            <input
-              ref={inputRef} // Attach the ref to the input element
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              style={{
-                ...overriddenStyles?.inputStyle,
-              }}
-              className={useExistingClasses({
-                existingClasses: "input-outline-none px-[10px] py-[5px] text-[13px]",
-                newClasses: overriddenStylesClassNames?.inputStyle,
-              })}
-            />
+            {searchEnable ? (
+              <input
+                ref={inputRef} // Attach the ref to the input element
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                style={{
+                  ...overriddenStyles?.inputStyle,
+                }}
+                className={useExistingClasses({
+                  existingClasses:
+                    "input-outline-none px-[10px] py-[5px] text-[13px]",
+                  newClasses: overriddenStylesClassNames?.inputStyle,
+                })}
+              />
+            ) : (
+              <></>
+            )}
             {filteredOptions.map((option, index) => (
               <div
                 key={index}

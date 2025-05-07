@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { SearchableDropdown } from "../components/inputs/SearchableDropdown/SearchableDropdown";
 
 type Node = {
   id: number;
@@ -141,11 +142,11 @@ export default function GraphPage(): JSX.Element {
   };
 
   const runAlgo = () => {
-    console.log('runAlgo::: ');
+    console.log("runAlgo::: ");
     if (selected.length < 2) return;
     const [start, end] = selected;
     const graph = buildGraph();
-    console.log('graph::: ', graph);
+    console.log("graph::: ", graph);
 
     const bfs = (): number[] => {
       const queue: number[][] = [[start]];
@@ -191,51 +192,121 @@ export default function GraphPage(): JSX.Element {
       return [];
     };
 
+    class MinHeapPriorityQueue {
+      private heap: { nodeId: number; priority: number }[] = [];
+
+      private swap(i: number, j: number) {
+        [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+      }
+
+      private bubbleUp(index: number) {
+        while (index > 0) {
+          const parent = Math.floor((index - 1) / 2);
+          if (this.heap[index].priority >= this.heap[parent].priority) break;
+          this.swap(index, parent);
+          index = parent;
+        }
+      }
+
+      private bubbleDown(index: number) {
+        const length = this.heap.length;
+        while (true) {
+          const left = 2 * index + 1;
+          const right = 2 * index + 2;
+          let smallest = index;
+
+          if (
+            left < length &&
+            this.heap[left].priority < this.heap[smallest].priority
+          ) {
+            smallest = left;
+          }
+          if (
+            right < length &&
+            this.heap[right].priority < this.heap[smallest].priority
+          ) {
+            smallest = right;
+          }
+          if (smallest === index) break;
+          this.swap(index, smallest);
+          index = smallest;
+        }
+      }
+
+      enqueue(nodeId: number, priority: number) {
+        this.heap.push({ nodeId, priority });
+        this.bubbleUp(this.heap.length - 1);
+      }
+
+      dequeue(): number | null {
+        if (this.heap.length === 0) return null;
+        const top = this.heap[0];
+        const end = this.heap.pop();
+        if (this.heap.length > 0 && end) {
+          this.heap[0] = end;
+          this.bubbleDown(0);
+        }
+        return top.nodeId;
+      }
+
+      isEmpty(): boolean {
+        return this.heap.length === 0;
+      }
+    }
+
     const dijkstra = (): number[] => {
-      const dist: Record<number, number> = {};
-      const prev: Record<number, number | null> = {};
-      const q = new Set<number>(nodes.map((n) => n.id));
+      const distances: Record<number, number> = {};
+      const previousNodes: Record<number, number | null> = {};
+      const visited = new Set<number>();
+      const pq = new MinHeapPriorityQueue();
 
-      nodes.forEach((n) => {
-        dist[n.id] = Infinity;
-        prev[n.id] = null;
+      // Initialize distances and previous nodes
+      nodes.forEach((node) => {
+        distances[node.id] = Infinity;
+        previousNodes[node.id] = null;
       });
-      dist[start] = 0;
+      distances[start] = 0;
+      pq.enqueue(start, 0);
 
-      while (q.size > 0) {
-        const u = [...q].reduce((a, b) => (dist[a] < dist[b] ? a : b));
-        q.delete(u);
+      while (!pq.isEmpty()) {
+        const currentNode = pq.dequeue();
+        if (currentNode === null || visited.has(currentNode)) continue;
+        visited.add(currentNode);
 
-        if (u === end) break;
+        if (currentNode === end) break;
 
-        for (const neighbor in graph[u]) {
-          const v = parseInt(neighbor);
-          const alt = dist[u] + graph[u][v];
-          if (alt < dist[v]) {
-            dist[v] = alt;
-            prev[v] = u;
+        for (const neighborId in graph[currentNode]) {
+          const neighbor = parseInt(neighborId);
+          const newDistance =
+            distances[currentNode] + graph[currentNode][neighbor];
+          if (newDistance < distances[neighbor]) {
+            distances[neighbor] = newDistance;
+            previousNodes[neighbor] = currentNode;
+            pq.enqueue(neighbor, newDistance); // Add/update priority
           }
         }
       }
 
-      const path: number[] = [];
-      let u: number | null = end;
-      while (u !== null) {
-        path.unshift(u);
-        u = prev[u];
+      // Reconstruct the shortest path from end to start
+      const shortestPath: number[] = [];
+      let currentNode: number | null = end;
+      while (currentNode !== null) {
+        shortestPath.unshift(currentNode);
+        currentNode = previousNodes[currentNode];
       }
-      return path[0] === start ? path : [];
+
+      return shortestPath[0] === start ? shortestPath : [];
     };
 
     const result = algo === "dfs" ? dfs() : algo === "bfs" ? bfs() : dijkstra();
-    console.log('result::: ', result);
+    console.log("result::: ", result);
     setPath(result);
   };
 
   return (
     <main className="flex flex-col items-center p-6 space-y-4">
       <h1 className="text-2xl font-bold">Graph Visualizer</h1>
-      <div className="flex justify-center w-full overflow-x-auto">
+      <div className="flex w-full 800:justify-center overflow-x-auto">
         <canvas
           ref={canvasRef}
           width={800}
@@ -256,17 +327,7 @@ export default function GraphPage(): JSX.Element {
       <div className="flex gap-4 flex-wrap justify-center">
         <Button onClick={connectNodes}>Connect</Button>
         <Button onClick={runAlgo}>Run {algo.toUpperCase()}</Button>
-        <select
-          value={algo}
-          onChange={(e) =>
-            setAlgo(e.target.value as "dfs" | "bfs" | "dijkstra")
-          }
-          className="border rounded px-3 py-2"
-        >
-          <option value="bfs">BFS</option>
-          <option value="dfs">DFS</option>
-          <option value="dijkstra">Dijkstra</option>
-        </select>
+        <SearchableDropdown searchEnable={false} options={["dfs", "bfs", "dijkstra"]} value={algo} onSelect={(val) => {setAlgo(val as "dfs" | "bfs" | "dijkstra")}}/>
         <Button
           onClick={() => {
             setNodes([]);

@@ -65,6 +65,9 @@ export default {
 			animation: {
 				"caret-blink": "caret-blink 1.25s ease-out infinite",
 			},
+			screens: {
+				'800': '800px',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
