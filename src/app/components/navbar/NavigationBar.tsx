@@ -1,6 +1,7 @@
 import { useRouteTo } from "@/nihon/app/utilities";
 import React, { useMemo, useState } from "react";
 import "./index.css"
+import { allRoutes } from "@/nihon/app/constants";
 
 export const Navbar = () => {
   const route = useRouteTo();
@@ -47,7 +48,11 @@ export const Navbar = () => {
         </button>
         <ul className="mt-16 space-y-4 p-4">
           <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/")}}>Home</li>
-          <li className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo("/parent-child-checkbox")}}>parent-child-checkbox</li>
+          {allRoutes.map(val => {
+            return (
+              <li key={val.title} className="hover:bg-gray-700 p-2 rounded" onClick={() => {routeTo(val.routeTo)}}>{val.title}</li>
+            )
+          })}
         </ul>
       </div>
 
