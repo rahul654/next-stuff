@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { SearchableDropdown } from "../components/inputs/SearchableDropdown/SearchableDropdown";
 
 type Node = {
-  id: number;
+  id: any;
   x: number;
   y: number;
 };
@@ -35,24 +35,31 @@ export default function GraphPage(): JSX.Element {
     { id: 2, x: 434, y: 259 },
     { id: 3, x: 586, y: 256 },
   ]);
+  console.log("nodes::: ", nodes);
 
   const [edges, setEdges] = useState<Edge[]>([
     [0, 1, 192],
     [0, 3, 211],
     [1, 2, 149],
     [2, 3, 152],
+    [1, 2, 149],
+    [2, 0, 140],
   ]);
+  console.log("edges::: ", edges);
 
-  const [selected, setSelected] = useState<number[]>([1, 3]);
+  const [selected, setSelected] = useState<number[]>([0, 2]);
+  console.log('selected::: ', selected);
   const [algo, setAlgo] = useState<"dfs" | "bfs" | "dijkstra">("dijkstra");
-  const [path, setPath] = useState<number[]>([1, 0, 3]);
+  const [path, setPath] = useState<number[]>([0, 2]);
+  console.log("path::: ", path);
 
   const radius = 20;
 
   const addNode = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const newNode: Node = {
-      id: nodes.length,
+      id:
+        (e.clientX - rect.left).toString() + (e.clientY - rect.top).toString(),
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
@@ -62,8 +69,10 @@ export default function GraphPage(): JSX.Element {
   const connectNodes = () => {
     if (selected.length === 2) {
       const [a, b] = selected;
-      const nodeA = nodes.find((n) => n.id === a);
-      const nodeB = nodes.find((n) => n.id === b);
+      const nodeA = nodes.find((n) => n.id == a);
+      console.log("nodeA::: ", nodeA);
+      const nodeB = nodes.find((n) => n.id == b);
+      console.log("nodeB::: ", nodeB);
       if (!nodeA || !nodeB) return;
 
       const dx = nodeA.x - nodeB.x;
@@ -74,9 +83,22 @@ export default function GraphPage(): JSX.Element {
       setSelected([]);
     }
   };
+  const deleteNodes = () => {
+    setNodes((prev) => {
+      return prev.filter((x) => !selected.includes(x.id));
+    });
+    setEdges((prev) => {
+      return prev.filter((x) => !x.some((val) => selected.includes(val)));
+    });
+    setPath((prev) => {
+      return prev.filter((x) => !selected.includes(x));
+    });
+  };
 
   const handleSelect = (id: number) => {
-    setSelected((prev) => (prev.includes(id) ? prev : [...prev, id].slice(-2)));
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x != id) : [...prev, id].slice(-2)
+    );
   };
 
   const draw = () => {
@@ -87,8 +109,8 @@ export default function GraphPage(): JSX.Element {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     edges.forEach(([from, to, weight]) => {
-      const a = nodes[from];
-      const b = nodes[to];
+      const a = nodes.find((n) => n.id == from);
+      const b = nodes.find((n) => n.id == to);
       if (!a || !b) return;
 
       ctx.beginPath();
@@ -104,8 +126,8 @@ export default function GraphPage(): JSX.Element {
     });
 
     for (let i = 0; i < path.length - 1; i++) {
-      const a = nodes[path[i]];
-      const b = nodes[path[i + 1]];
+      const a = nodes.find((item) => item.id === path[i]);
+      const b = nodes.find((item) => item.id === path[i + 1]);
       if (!a || !b) continue;
 
       ctx.beginPath();
@@ -125,7 +147,7 @@ export default function GraphPage(): JSX.Element {
       ctx.strokeStyle = "black";
       ctx.stroke();
       ctx.fillStyle = "black";
-      ctx.fillText(node.id.toString(), node.x - 4, node.y + 4);
+      // ctx.fillText(node.id.toString(), node.x - 4, node.y + 4);
     });
   };
 
@@ -326,8 +348,16 @@ export default function GraphPage(): JSX.Element {
       </div>
       <div className="flex gap-4 flex-wrap justify-center">
         <Button onClick={connectNodes}>Connect</Button>
+        <Button onClick={deleteNodes}>Delete</Button>
         <Button onClick={runAlgo}>Run {algo.toUpperCase()}</Button>
-        <SearchableDropdown searchEnable={false} options={["dfs", "bfs", "dijkstra"]} value={algo} onSelect={(val) => {setAlgo(val as "dfs" | "bfs" | "dijkstra")}}/>
+        <SearchableDropdown
+          searchEnable={false}
+          options={["dfs", "bfs", "dijkstra"]}
+          value={algo}
+          onSelect={(val) => {
+            setAlgo(val as "dfs" | "bfs" | "dijkstra");
+          }}
+        />
         <Button
           onClick={() => {
             setNodes([]);
