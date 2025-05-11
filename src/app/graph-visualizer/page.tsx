@@ -30,27 +30,110 @@ const Button = ({
 export default function GraphPage(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [nodes, setNodes] = useState<Node[]>([
-    { id: 0, x: 425, y: 119 },
-    { id: 1, x: 285, y: 251 },
-    { id: 2, x: 434, y: 259 },
-    { id: 3, x: 586, y: 256 },
-  ]);
+    {
+        "id": "354155",
+        "x": 354,
+        "y": 155
+    },
+    {
+        "id": "246271",
+        "x": 246,
+        "y": 271
+    },
+    {
+        "id": "369271",
+        "x": 369,
+        "y": 271
+    },
+    {
+        "id": "496274",
+        "x": 496,
+        "y": 274
+    },
+    {
+        "id": "144391",
+        "x": 144,
+        "y": 391
+    },
+    {
+        "id": "303400",
+        "x": 303,
+        "y": 400
+    },
+    {
+        "id": "449394",
+        "x": 449,
+        "y": 394
+    },
+    {
+        "id": "571389",
+        "x": 571,
+        "y": 389
+    }
+] as any);
   console.log("nodes::: ", nodes);
 
   const [edges, setEdges] = useState<Edge[]>([
-    [0, 1, 192],
-    [0, 3, 211],
-    [1, 2, 149],
-    [2, 3, 152],
-    [1, 2, 149],
-    [2, 0, 140],
-  ]);
+    [
+        "354155",
+        "369271",
+        117
+    ],
+    [
+        "354155",
+        "246271",
+        158
+    ],
+    [
+        "246271",
+        "144391",
+        157
+    ],
+    [
+        "354155",
+        "496274",
+        185
+    ],
+    [
+        "369271",
+        "303400",
+        145
+    ],
+    [
+        "369271",
+        "449394",
+        147
+    ],
+    [
+        "496274",
+        "571389",
+        137
+    ],
+    [
+        "369271",
+        "496274",
+        127
+    ],
+    [
+        "246271",
+        "369271",
+        123
+    ]
+] as any);
   console.log("edges::: ", edges);
 
-  const [selected, setSelected] = useState<number[]>([0, 2]);
+  const [selected, setSelected] = useState<number[]>([
+    "246271",
+    "571389"
+] as any);
   console.log('selected::: ', selected);
   const [algo, setAlgo] = useState<"dfs" | "bfs" | "dijkstra">("dijkstra");
-  const [path, setPath] = useState<number[]>([0, 2]);
+  const [path, setPath] = useState<number[]>([
+    "246271",
+    "369271",
+    "496274",
+    "571389"
+] as unknown as number[]);
   console.log("path::: ", path);
 
   const radius = 20;
@@ -126,8 +209,8 @@ export default function GraphPage(): JSX.Element {
     });
 
     for (let i = 0; i < path.length - 1; i++) {
-      const a = nodes.find((item) => item.id === path[i]);
-      const b = nodes.find((item) => item.id === path[i + 1]);
+      const a = nodes.find((item) => item.id == path[i]);
+      const b = nodes.find((item) => item.id == path[i + 1]);
       if (!a || !b) continue;
 
       ctx.beginPath();
@@ -175,10 +258,14 @@ export default function GraphPage(): JSX.Element {
       const visited = new Set<number>();
 
       while (queue.length > 0) {
+        console.log('queue::: ', queue);
         const currentPath = queue.shift()!;
+        console.log('currentPath::: ', currentPath);
         const node = currentPath.at(-1)!;
+        console.log('node::: ', node);
+        console.log('end::: ', end);
 
-        if (node === end) return currentPath;
+        if (node == end) return currentPath;
         if (visited.has(node)) continue;
         visited.add(node);
 
@@ -200,12 +287,12 @@ export default function GraphPage(): JSX.Element {
         const currentPath = stack.pop()!;
         const node = currentPath.at(-1)!;
 
-        if (node === end) return currentPath;
+        if (node == end) return currentPath;
         if (visited.has(node)) continue;
         visited.add(node);
 
         for (const neighbor in graph[node]) {
-          const next = parseInt(neighbor);
+          const next = neighbor as any;
           if (!visited.has(next)) {
             stack.push([...currentPath, next]);
           }
@@ -298,7 +385,7 @@ export default function GraphPage(): JSX.Element {
         if (currentNode === end) break;
 
         for (const neighborId in graph[currentNode]) {
-          const neighbor = parseInt(neighborId);
+          const neighbor = neighborId as any;
           const newDistance =
             distances[currentNode] + graph[currentNode][neighbor];
           if (newDistance < distances[neighbor]) {
