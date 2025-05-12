@@ -173,9 +173,7 @@ export default function GraphPage(): JSX.Element {
     setEdges((prev) => {
       return prev.filter((x) => !x.some((val) => selected.includes(val)));
     });
-    setPath((prev) => {
-      return prev.filter((x) => !selected.includes(x));
-    });
+    setPath([]);
   };
 
   const handleSelect = (id: number) => {
